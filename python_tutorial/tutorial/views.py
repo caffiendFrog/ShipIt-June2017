@@ -62,17 +62,15 @@ def events(request):
     busyTime = 0;
     for e in events['value']:
       status = e['showAs']
-      if e['isAllDay'] and (status == "busy"):
+      if (e['isAllDay'] and (status == "busy")) or (status == "busy") or (status == "oof"):
         filtered.append(e)
-      if (status == "busy") or (status == "oof") :
-        filtered.append(e)
-      startTimeStr = e['start']['dateTime']
-      endTimeStr = e['end']['dateTime']
-      startTime = datetime.strptime(startTimeStr[0:len(startTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
-      endTime = datetime.strptime(endTimeStr[0:len(endTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
-      e['delta'] = endTime - startTime
-      busyTime = busyTime + e['delta'].total_seconds()
-    # context = { 'events': events['value'] }
-
-    context = {'events': filtered, 'busyTime': busyTime/3600}
+        startTimeStr = e['start']['dateTime']
+        endTimeStr = e['end']['dateTime']
+        startTime = datetime.strptime(startTimeStr[0:len(startTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
+        endTime = datetime.strptime(endTimeStr[0:len(endTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
+        e['delta'] = endTime - startTime
+        busyTime = busyTime + (e['delta'].total_seconds()/3600)
+# context = { 'events': events['value'] }
+    freeTime = (7*5) - busyTime
+    context = {'events': filtered, 'busyTime': busyTime, 'freeTime': freeTime}
     return render(request, 'tutorial/events.html', context)
