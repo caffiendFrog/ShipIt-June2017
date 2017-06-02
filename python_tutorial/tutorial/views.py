@@ -7,6 +7,7 @@ from tutorial.authhelper import get_signin_url
 from tutorial.outlookservice import get_me
 from tutorial.authhelper import get_signin_url, get_token_from_code, get_access_token
 from tutorial.outlookservice import get_me, get_my_messages, get_my_events
+from datetime import datetime
 import time
 
 # Create your views here.
@@ -57,5 +58,28 @@ def events(request):
     return HttpResponseRedirect(reverse('tutorial:home'))
   else:
     events = get_my_events(access_token, user_email)
-    context = { 'events': events['value'] }
+    filtered = []
+    for e in events['value']:
+      status = e['showAs']
+      # print e['showAs']
+      if e['isAllDay'] and (status == "busy"):
+        filtered.append(e)
+      if (status == "busy") or (status == "oof") :
+        filtered.append(e)
+      # startTime = datetime.strptime(e['start'])
+      # print dateStr[0:(len(dateStr) - 1)]
+      startTimeStr = e['start']['dateTime']
+      # print len(startTimeStr)
+      # print startTimeStr[0:len(startTimeStr-1)]
+      # startTimeStr = startTimeStr[0:len(startTimeStr-1)]
+      startTime = datetime.strptime(startTimeStr[0:len(startTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
+      print startTime
+      endTimeStr = e['end']['dateTime']
+      endTime = datetime.strptime(endTimeStr[0:len(endTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
+      # print e['start']['dateTime']
+      # e['delta'] = e['end'] - e['start']
+      e['delta'] = endTime - startTime
+    # context = { 'events': events['value'] }
+
+    context = {'events': filtered}
     return render(request, 'tutorial/events.html', context)

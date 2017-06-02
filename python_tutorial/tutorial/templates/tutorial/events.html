@@ -13,6 +13,9 @@
       <td>{{ event.subject }}</td>
       <td>{{ event.start.dateTime }} ({{ event.start.timeZone }})</td>
       <td>{{ event.end.dateTime }} ({{ event.end.timeZone }})</td>
+      <td>{{ event.delta}} </td>
+      <td>{{ event.isAllDay }}</td>
+      <td>{{ event.showAs}} </td>
     </tr>
   {% endfor %}
 </table>
