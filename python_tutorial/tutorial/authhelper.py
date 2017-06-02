@@ -22,7 +22,8 @@ token_url = '{0}{1}'.format(authority, '/common/oauth2/v2.0/token')
 scopes = [ 'openid',
 	   'offline_access',
            'User.Read',
-           'Mail.Read' ]
+           'Mail.Read',
+           'Calendars.Read' ]
 
 def get_signin_url(redirect_uri):
   # Build the query parameters for the signin url
@@ -95,3 +96,21 @@ def get_access_token(request, redirect_uri):
     request.session['token_expires'] = expiration
 
     return new_tokens['access_token']
+
+def get_my_events(access_token, user_email):
+  get_events_url = graph_endpoint.format('/me/events')
+
+  # Use OData query parameters to control the results
+  #  - Only first 10 results returned
+  #  - Only return the Subject, Start, and End fields
+  #  - Sort the results by the Start field in ascending order
+  query_parameters = {'$top': '10',
+                      '$select': 'subject,start,end',
+                      '$orderby': 'start/dateTime ASC'}
+
+  r = make_api_call('GET', get_events_url, access_token, user_email, parameters = query_parameters)
+
+  if (r.status_code == requests.codes.ok):
+    return r.json()
+  else:
+    return "{0}: {1}".format(r.status_code, r.text)

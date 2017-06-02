@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from tutorial.authhelper import get_signin_url
 from tutorial.outlookservice import get_me
 from tutorial.authhelper import get_signin_url, get_token_from_code, get_access_token
-from tutorial.outlookservice import get_me, get_my_messages
+from tutorial.outlookservice import get_me, get_my_messages, get_my_events
 import time
 
 # Create your views here.
@@ -48,3 +48,14 @@ def mail(request):
     messages = get_my_messages(access_token, user_email)
     context = { 'messages': messages['value'] }
     return render(request, 'tutorial/mail.html', context)
+
+def events(request):
+  access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
+  user_email = request.session['user_email']
+  # If there is no token in the session, redirect to home
+  if not access_token:
+    return HttpResponseRedirect(reverse('tutorial:home'))
+  else:
+    events = get_my_events(access_token, user_email)
+    context = { 'events': events['value'] }
+    return render(request, 'tutorial/events.html', context)
