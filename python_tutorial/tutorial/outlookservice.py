@@ -69,18 +69,18 @@ def get_my_messages(access_token, user_email):
     return "{0}: {1}".format(r.status_code, r.text)
 
 def get_my_events(access_token, user_email):
-  # get_events_url = graph_endpoint.format('/me/calendarview')
-  get_events_url = graph_endpoint.format('/me/events')
+  get_events_url = graph_endpoint.format('/me/calendarview')
+  # get_events_url = graph_endpoint.format('/me/events')
   # Use OData query parameters to control the results
   #  - Only first 10 results returned
   #  - Only return the Subject, Start, and End fields
   #  - Sort the results by the Start field in ascending order
 
-  query_parameters = {'$last': '10',
-                      '$select': 'subject,start,end,isAllDay,showAs',
-                      '$orderby': 'start/dateTime ASC'}
-  # query_parameters = {'startdatetime': '2017-06-02',
-  #                     'enddatetime': '2017-06-09'}
+  # query_parameters = {'$last': '10',
+  #                     '$select': 'subject,start,end,isAllDay,showAs',
+  #                     '$orderby': 'start/dateTime ASC'}
+  query_parameters = {'startdatetime': '2017-06-02',
+                      'enddatetime': '2017-06-09'}
 
   r = make_api_call('GET', get_events_url, access_token, user_email, parameters = query_parameters)
 

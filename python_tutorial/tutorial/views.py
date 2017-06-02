@@ -59,27 +59,20 @@ def events(request):
   else:
     events = get_my_events(access_token, user_email)
     filtered = []
+    busyTime = 0;
     for e in events['value']:
       status = e['showAs']
-      # print e['showAs']
       if e['isAllDay'] and (status == "busy"):
         filtered.append(e)
       if (status == "busy") or (status == "oof") :
         filtered.append(e)
-      # startTime = datetime.strptime(e['start'])
-      # print dateStr[0:(len(dateStr) - 1)]
       startTimeStr = e['start']['dateTime']
-      # print len(startTimeStr)
-      # print startTimeStr[0:len(startTimeStr-1)]
-      # startTimeStr = startTimeStr[0:len(startTimeStr-1)]
-      startTime = datetime.strptime(startTimeStr[0:len(startTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
-      print startTime
       endTimeStr = e['end']['dateTime']
+      startTime = datetime.strptime(startTimeStr[0:len(startTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
       endTime = datetime.strptime(endTimeStr[0:len(endTimeStr)-1], '%Y-%m-%dT%H:%M:%S.%f')
-      # print e['start']['dateTime']
-      # e['delta'] = e['end'] - e['start']
       e['delta'] = endTime - startTime
+      busyTime = busyTime + e['delta'].total_seconds()
     # context = { 'events': events['value'] }
 
-    context = {'events': filtered}
+    context = {'events': filtered, 'busyTime': busyTime/3600}
     return render(request, 'tutorial/events.html', context)
